@@ -21,6 +21,7 @@ return [
             "stylesheets" => [
                 // Change here to set another default stylesheet
                 "css/dbwebb-se.min.css",
+                "css/style.css",
                 //"css/another.min.css",
             ],
             "javascripts" => [
