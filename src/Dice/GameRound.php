@@ -20,7 +20,7 @@ class GameRound
      * @param int $computerRoundScore  Start score for computer
      *
      */
-    public function __construct(int $playerRoundScore = 0, int $computerRoundScore = 0)
+    public function __construct()
     {
         $this->playerHand = new Hand();
         $this->computerHand = new Hand();

@@ -12,7 +12,6 @@ class GameController extends GameRound
     private $totComputerScore;
     private $roundPlayerScore;
     private $roundComputerScore;
-    private $sum;
 
     /**
      * Constructor to initiate the object with current game settings,
@@ -25,12 +24,9 @@ class GameController extends GameRound
     public function __construct(int $totPlayerScore = 0, int $totComputerScore = 0, int $roundPlayerScore = 0)
     {
         $this->totPlayerScore = $totPlayerScore;
-        $this->roundPlayerScore = $roundPlayerScore;
         $this->totComputerScore = $totComputerScore;
+        $this->roundPlayerScore = $roundPlayerScore;
     }
-
-
-
 
     /**
     *  Sums the values of each side of the dice
@@ -54,11 +50,25 @@ class GameController extends GameRound
     {
         foreach ($rolledHand as $dice) {
             if ($dice->getValue() === 1) {
-                echo "true";
                 return true;
             }
         }
     }
+
+
+    /**
+    *  run through hand and see if one of the
+    *  dices have the value 1.
+    */
+    public function rollComputerHasAValueOne($rolledHand)
+    {
+        foreach ($rolledHand as $dice) {
+            if ($dice->getValue() === 1) {
+                return true;
+            }
+        }
+    }
+
 
     // if the total score is => 100 -- STILL NEED TO TRY!
     public function isBigger100($totScore)
@@ -69,8 +79,6 @@ class GameController extends GameRound
             return false;
         }
     }
-
-
 
     public function getTotPlayerScore()
     {
@@ -89,9 +97,8 @@ class GameController extends GameRound
 
     public function getRoundComputerScore()
     {
-        return $this->computerRoundScore;
+        return $this->roundComputerScore;
     }
-
     /**
     *  Sets round score to 0, when they rolled a dice with walue 1
     */
@@ -100,6 +107,13 @@ class GameController extends GameRound
         return $this->roundPlayerScore = 0;
     }
 
+    /**
+    *  Sets round score to 0, when they rolled a dice with walue 1
+    */
+    public function setComputerScoreToZero()
+    {
+        return $this->roundComputerScore = 0;
+    }
 
 
     /**
@@ -114,8 +128,17 @@ class GameController extends GameRound
         return $this->roundPlayerScore;
     }
 
+    /**
+    *  Updates the TOTAL GAME SCORE - for player
+    */
+    public function updateRoundComputerScore($newPoints)
+    {
+        $updatedPoints = $this->roundComputerScore + $newPoints;
 
+        $this->roundComputerScore = $updatedPoints;
 
+        return $this->roundComputerScore;
+    }
 
     /**
     *  Updates the TOTAL GAME SCORE - for player
@@ -129,14 +152,15 @@ class GameController extends GameRound
         return $this->totPlayerScore;
     }
 
-
-    /**
-    *  Updates the TOTAL GAME SCORE - for Computer
-    */
-
-
     /**
     *  Updates the TOTAL GAME SCORE - for computer
     */
+    public function updateTotComputerScore($roundScore)
+    {
+        $updatedPoints = $this->totComputerScore + $roundScore;
 
+        $this->totComputerScore = $updatedPoints;
+
+        return $this->totComputerScore;
+    }
 }

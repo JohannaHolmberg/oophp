@@ -78,8 +78,8 @@ class GameControllerTest extends TestCase
         $tps = $gameController->getTotPlayerScore();
         $this->assertEquals(10, $tps);
 
-        $cs = $gameController->getTotComputerScore();
-        $this->assertEquals(11, $cs);
+        $cpc = $gameController->getTotComputerScore();
+        $this->assertEquals(11, $cpc);
 
         $rps = $gameController->getRoundPlayerScore();
         $this->assertEquals(12, $rps);

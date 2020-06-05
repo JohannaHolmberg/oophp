@@ -9,7 +9,7 @@ class Hand
     {
         $this->dices[0] = new Dice();
         $this->dices[1] = new Dice();
-        // $this->dices[2] = new Dice();
+        $this->dices[2] = new Dice();
         // $this->dices[3] = new Dice();
         // $this->dices[4] = new Dice();
     }
@@ -18,7 +18,7 @@ class Hand
     {
         $this->dices[0]->getValue();
         $this->dices[1]->getValue();
-        // $this->dices[2]->getValue();
+        $this->dices[2]->getValue();
         // $this->dices[3]->getValue();
         // $this->dices[4]->getValue();
 

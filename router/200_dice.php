@@ -20,10 +20,7 @@ $app->router->get("dice/init", function () use ($app) {
     $round = new Jo\Dice\GameRound();
 
     $_SESSION["playerRoundScore"] = $game->getRoundPlayerScore();
-    $_SESSION["computerRoundScore"] = $game->getRoundComputerScore();
-
     $_SESSION["playerHand"] = $round->getPlayerHand();
-    $_SESSION["computerHand"] = $round->getComputerHand();
 
     // save game in session
     $_SESSION["game"] = $game;
@@ -37,149 +34,108 @@ $app->router->get("dice/init", function () use ($app) {
  */
 $app->router->get("dice/play", function () use ($app) {
     $title = "Dice 100 game";
-    // put gavecontroller in a variable
-    $game = $_SESSION["game"];
+
+    $game = $_SESSION["game"]; // put gavecontroller in a variable
+    $pHand = $_SESSION["playerHand"]; // get value of each rolled hand
+    //$roll = $_SESSION["roll"]; // get value from Post buttons
+
+    // hide roll to see if message dissapears on student server
 
 
-    // GET VARIABLES FROM POST ROUTER
-
-
-    // get total score for both players
-    $totPlayerScore = $_SESSION["totPlayerScore"];
-    $totComputerScore = $_SESSION["totComputerScore"];
-
-    // get this rounds score for both players
-    $playerRoundScore = $_SESSION["playerRoundScore"];
-    $computerRoundScore = $_SESSION["computerRoundScore"];
-
-    // get value of each rolled hand
-    $pHand = $_SESSION["playerHand"];
-    $cHand = $_SESSION["computerHand"];
-
-    $round = $_SESSION["round"];
-
-    // get value from Post buttons
-    $roll = $_SESSION["roll"];
-    $saved = $_SESSION["saved"];
 
 
     // when changed to true, it will mean that the save button has been clicked
     // send this variable to play.php
     $savedRound = false;
 
-
-    /**
-    *  Updates the TOTAL GAME SCORE when click SAVE
-    */
-
-    var_dump($_SESSION["roll"]);
-    var_dump($_SESSION["saved"]);
-    var_dump($saved);
-
-    if ($saved) {
-        $savedRound = true;
-
-        var_dump($playerRoundScore);
-        var_dump($totPlayerScore);
-
-        $totPlayerScore = $game->updateTotPlayerScore($playerRoundScore);
-        var_dump($totPlayerScore);
-
-        $_SESSION["totPlayerScore"] = $totPlayerScore;
-        var_dump($totPlayerScore);
-
-        //set round score to 0
-        $_SESSION["playerRoundScore"] = $game->setPlayerScoreToZero();
-    }
-
-
-    // ROLL clicked-------------------------------------------------------------
-
     // Before rolled dice, they hand is not shown on screen
     // It only show after roll button is clicked and it changes to TRUE
     $rolledDice = false;
 
 
+    //$playerWon = $_SESSION["playerWon"];
+    $playerWon = false; // player wins when this is changed to true
+    $computerWon = false; // computer wins when this is changed to true
 
-    // if the button "roll" has been clicked, this should happen:
+    $computerRollHasA1Value = false;
+    $playerRollHasA1Value = false;
+
+    $totComputerScore = $_SESSION["totComputerScore"];
+    $playerRollHasA1Value = $_SESSION["playerRollHasA1Value"];
+    $computerRollHasA1Value = $_SESSION["computerRollHasA1Value"];
+
+
+    /**
+    *
+    * if the button "ROLL" has been clicked, this happens:
+    *
+    */
     if ($_SESSION["roll"]) {
-        echo "rolled";
-        // Changed the $rolledDice variable to TRUE to show that dice has ben rolled
-        $rolledDice = true;
+        // remove computer roll text
 
-        $_SESSION["roll"] = null; // dont know why this is here?
+        $computerRollHasA1Value = false;
+        $_SESSION["computerRollHasA1Value"] = $computerRollHasA1Value;
+
+
+
+        $rolledDice = true; // true to send to play.php, to say dice has rolled
+
+        // remove roll after rolled dice, otherwise the hand will always show
+        $_SESSION["roll"] = null;
 
         // check if there is a 1, if 1 then return TRUE
         $playerRollHasA1Value = $game->rollHasAValueOne($pHand->getDiceValue());
+        $_SESSION["playerRollHasA1Value"] = $playerRollHasA1Value;
 
         /**
          * IF STATMENT for ROLL, to see if there has been rolled a 1!
          */
-
-         // get the current round score OUTSIDE the if statment, to work??????????????????????????????????????????????????
-         $playerRoundScore = $_SESSION["playerRoundScore"];
-         $totPlayerScore = $_SESSION["totPlayerScore"];
-
         if ($playerRollHasA1Value) { // if true -> there is a 1 in the hand of dices
-            //echo "You rolled a 1";
-
-            // 1. set PlayerRoundscore to 0
-
-            // set score to null or 0??
-            //$playerRoundScore = 0;
+            // remove all points from player, set round player score to 0
             $game->setPlayerScoreToZero();
-
-            //save to session?
-            $playerRoundScore = 0;
-
-            $_SESSION["playerRoundScore"] = 0;
-            var_dump($_SESSION["playerRoundScore"]); // works, shows sum when not rolled 1 and shows 0 when 1 was rolled
-
-
-            // 2. play for computer
-                // - >
-
-
-
-
         } else { // No 1 in hand of dice, player won one round
-
-            //echo "You did NOT roll a 1";
-
-            // get the old score, from post
-            //$playerRoundScore = $_SESSION["playerRoundScore"];
-
             // get the new round hand value sum score
             $prs = $game->sumHandValueForOneRound($pHand->getDiceValue());
 
             // update new with old score
             $playerRoundScore = $game->updateRoundPlayerScore($prs);
-            var_dump($playerRoundScore);
-
-            // save the round score in session.
-            $_SESSION["playerRoundScore"] = $playerRoundScore;
         }
 
+        // check here if tot points is more than 100
+        $roundScore = $game->getRoundPlayerScore();
+        $totScore = $game->getTotPlayerScore();
+
+        if ($game->isBigger100($roundScore + $totScore)) { // create variables here to send to play.php
+            $playerWon = true;
+            $_SESSION["playerWon"] = $playerWon;
+        }
+    } // end "roll"
+
+    $totComputerScore = $game->getTotComputerScore();
+
+    if ($game->isBigger100($totComputerScore)) { // check here if tot points is more than 100
+        $_SESSION["computerWon"] = true;
+        $computerWon = $_SESSION["computerWon"];
     }
 
-    // put this in data to send to play.php
-    //$playerRollHasA1Value = $game->rollHasAValueOne($pHand->getDiceValue());
 
-    // put computers roll in SAVE and in ROLL where you got a 1!!!!!!!!!!!
-    $computerRollHasA1Value = $game->rollHasAValueOne($cHand->getDiceValue());
-    // -----------------------------------------------------------------------
+
+
+
+
 
     $data = [
-        //"dices" => $dices ?? null,
         //"content" => "Hello World in " . __FILE__,
         "playerHand" => $pHand->getDiceValue() ?? "",
-        "computerHand" => $cHand->getDiceValue() ?? "",
         "rolledDice" => $rolledDice,
-        "playerRollHasA1Value" => $game->rollHasAValueOne($pHand->getDiceValue()),
-        "playerRoundScore" => $playerRoundScore,
+        "savedRound" => $_SESSION["savedRound"],
+        "playerRoundScore" => $game->getRoundPlayerScore(),
         "totPlayerScore" => $game->getTotPlayerScore(),
-        "savedRound" => $savedRound
-
+        "totComputerScore" => $game->getTotComputerScore(),
+        "playerRollHasA1Value" => $playerRollHasA1Value,
+        "computerRolledOne" => $computerRollHasA1Value,
+        "playerWon" => $playerWon,
+        "computerWon" => $computerWon
     ];
 
     $app->page->add("dice/play", $data);
@@ -198,8 +154,73 @@ $app->router->post("dice/play", function () use ($app) {
 
     // Deal with incoming variables
     $roll = $_POST["roll"] ?? null;
-    $saved = $_POST["saved"] ?? null;
-    //$reset = $_POST["reset"] ?? null;
+    $save = $_POST["save"] ?? null;
+    $simulateComputer = $_POST["simulateComputer"] ?? null;
+
+
+    /**
+    *
+    *  When COMPUTER simulation is clicked
+    *
+    */
+    if (isset($_POST["simulateComputer"])) {
+        $playerRollHasA1Value = false;
+        $_SESSION["playerRollHasA1Value"] = $playerRollHasA1Value; // remove player text
+
+        $round = new Jo\Dice\GameRound(); // start a new round with the GameRound
+
+        $game = $_SESSION["game"]; // save game object in variable to use later
+        $cHand = $round->getComputerHand(); // save computer hand rolled
+
+        $_SESSION["cHand"] = $cHand;
+        /**
+         * IF STATMENT for COMPUTER ROLL, to see if there has been rolled a 1!
+         */
+        if ($game->rollComputerHasAValueOne($cHand->getDiceValue())) {  // if true -> there is a 1 in the hand of dices
+            // remove all points from player, set round player score to 0
+            $game->setComputerScoreToZero();
+
+
+            $computerRollHasA1Value = $game->rollComputerHasAValueOne($cHand->getDiceValue());
+            $_SESSION["computerRollHasA1Value"] = $computerRollHasA1Value;
+        } else {  // No 1 in hand of dice,
+            // get the new round hand value sum score
+            $prs = $game->sumHandValueForOneRound($cHand->getDiceValue());
+            $computerRoundScore = $game->updateRoundComputerScore($prs); // update new with old score
+
+            $ran = rand(1, 2); // get a random number to see if computer wants to roll again or save
+
+            if ($ran === 1) { // computer wants to roll again
+                $round = new Jo\Dice\GameRound();
+
+                if ($game->rollComputerHasAValueOne($cHand->getDiceValue())) {  // if true -> there is a 1 in the hand of dices
+                    // remove all points from player, set round player score to 0
+                    $game->setComputerScoreToZero();
+
+                    $computerRollHasA1Value = $game->rollComputerHasAValueOne($cHand->getDiceValue());
+                    $_SESSION["computerRollHasA1Value"] = $computerRollHasA1Value;
+                } else {
+                    // get the new round hand value sum score
+                    $prs = $game->sumHandValueForOneRound($cHand->getDiceValue());
+                    $computerRoundScore = $game->updateRoundComputerScore($prs); // update new with old score
+
+                    $totComputerScore = $game->updateTotComputerScore($computerRoundScore); // update totComputerScore
+                    $computerRoundScore = $game->setComputerScoreToZero(); //set round score to 0
+                }
+            } elseif ($ran === 2) {  // computer wants to save the first roll
+                $totComputerScore = $game->updateTotComputerScore($computerRoundScore); // update totComputerScore
+                $computerRoundScore = $game->setComputerScoreToZero(); //set round score to 0
+            }
+        }
+    }
+
+
+
+
+
+
+
+
 
     /**
     *  When ROLL button is clicked
@@ -213,29 +234,30 @@ $app->router->post("dice/play", function () use ($app) {
         $game = $_SESSION["game"];
 
         $_SESSION["playerRoundScore"] = $game->getRoundPlayerScore();
-        $_SESSION["computerRoundScore"] = $game->getRoundComputerScore();
-
         $_SESSION["playerHand"] = $round->getPlayerHand();
-        $_SESSION["computerHand"] = $round->getComputerHand();
 
         // save round in session
         $_SESSION["round"] = $round;
 
-        //$_SESSION["roll"] = $roll;
+        $_SESSION["roll"] = $roll;
     }
 
 
     /**
     *  When SAVE button is clicked
     */
-    if (isset($_POST["saved"])) {
-        // save variable in session to use later
-        // when save round score to tot score
-        $game = $_SESSION["game"];
-        $totPlayerScore = $game->getTotPlayerScore();
-        $_SESSION["totPlayerScore"] = $totPlayerScore;
+    if (isset($_POST["save"])) {
+        $game = $_SESSION["game"]; // get game object from session
+        $_SESSION["savedRound"] = true; //save in session, to send to play.php;
 
-        //$_SESSION["saved"] = $saved;
+        // get RoundScore for both players, to update to tot score
+        $playerRoundScore = $game->getRoundPlayerScore();
+
+        // update totPlayerScore
+        $totPlayerScore = $game->updateTotPlayerScore($playerRoundScore);
+
+        //set round score to 0
+        $playerRoundScore = $game->setPlayerScoreToZero();
     }
 
     return $app->response->redirect("dice/play");

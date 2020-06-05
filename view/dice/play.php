@@ -32,9 +32,25 @@ namespace Anax\View;
             <?php endif; ?>
 
 
-            <!--  If a one is rolled this is printed out -->
+            <!--  PLAYER If a dice with value 1 is rolled this is printed out -->
             <?php if ($playerRollHasA1Value) : ?>
-                <p> You rolled a 1 </p>
+                <p> You rolled a 1, play for the computer now! </p>
+            <?php endif; ?>
+
+            <!-- COMPUTER If a dice with value 1 is rolled this is printed out -->
+            <?php if ($computerRolledOne) : ?>
+                <p> Computer rolled a 1 </p>
+            <?php endif; ?>
+
+
+            <!--  if player has 100 or more points -->
+            <?php if ($playerWon) : ?>
+                <p> YOU WON!!!!! </p>
+            <?php endif; ?>
+
+            <!--  if player has 100 or more points -->
+            <?php if ($computerWon) : ?>
+                <p> COMPUTER WON!!!!! </p>
             <?php endif; ?>
 
         </div>
@@ -44,31 +60,27 @@ namespace Anax\View;
         <div class="main-left-bottom-div">
             <form method="post">
                 <input class="button red-button" type="submit" name="roll" value="Roll">
-                <input class="button green-button" type="submit" name="saved" value="Save">
-                <input class="button blue-button" type="submit" name="reset" value="Reset">
+                <input class="button green-button" type="submit" name="save" value="Save">
+                <input class="button red-button" type="submit" name="simulateComputer" value="Play for computer">
             </form>
         </div>
 
     </div>
 
 
-
-
     <div class="main-right-div">
         <h3>Current Score</h3>
-            <p>Player:</p>
             <?= $playerRoundScore ?>
 
-            <p>Computer:</p>
+        <h3>Total Score</h3>
 
-        <?php if ($savedRound) : ?>
-            <h3>Total Score</h3>
+        <?php if ($savedRound || $totComputerScore) : ?>
             <p>Player:</p>
             <?= $totPlayerScore ?>
+
             <p>Computer:</p>
-
+            <?= $totComputerScore ?>
         <?php endif; ?>
-
 
     </div>
 </div> <!-- END container -->
