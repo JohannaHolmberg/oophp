@@ -73,5 +73,10 @@ return [
             "url" => "dice-game",
             "title" => "Spela 100 spelet",
         ],
+        [
+            "text" => "Dice game 1",
+            "url" => "dice1/init",
+            "title" => "Spela 100 spelet",
+        ],
     ],
 ];

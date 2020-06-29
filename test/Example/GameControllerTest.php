@@ -84,4 +84,69 @@ class GameControllerTest extends TestCase
         $rps = $gameController->getRoundPlayerScore();
         $this->assertEquals(12, $rps);
     }
+
+    public function testrollComputerHasAValueOne()
+    {
+        $hand = new Hand();
+        $gameController = new GameController();
+
+        $hasOne = $gameController->rollComputerHasAValueOne($hand);
+
+        $this->assertEquals(is_bool($hasOne), $hasOne);
+    }
+
+    public function testrollHasAValueOne()
+    {
+        $hand = new Hand();
+        $gameController = new GameController();
+
+        $hasOne = $gameController->rollHasAValueOne($hand);
+
+        $this->assertEquals(is_bool($hasOne), $hasOne);
+    }
+
+
+    public function testgetRoundComputerScore()
+    {
+        $hand = new Hand();
+        $gameController = new GameController();
+
+        $hasOne = $gameController->getRoundComputerScore($hand);
+
+        $this->assertEquals(is_int($hasOne), $hasOne);
+    }
+
+    public function testsetComputerScoreToZero()
+    {
+        $gameController = new GameController();
+
+        $zero = $gameController->setComputerScoreToZero();
+
+        $this->assertEquals(0, $zero);
+    }
+
+
+    public function testupdateRoundComputerScore()
+    {
+        $gameController = new GameController();
+
+        $zero = $gameController->updateRoundComputerScore(5);
+
+        $this->assertEquals(5, $zero);
+    }
+
+
+    public function testupdateTotComputerScore()
+    {
+        $gameController = new GameController();
+
+        $zero = $gameController->updateTotComputerScore(5);
+
+        $this->assertEquals(5, $zero);
+    }
+
+
+
+
+
 }

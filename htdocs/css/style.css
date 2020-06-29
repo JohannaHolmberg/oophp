@@ -44,6 +44,14 @@ h3 {
 
 
 
+.main-left-bottom-div-computer {
+    float: right;
+}
+
+.main-left-bottom-div-player {
+    display: inline-block;
+}
+
 
 
 /* RIGHT SIDE OF GAME */
