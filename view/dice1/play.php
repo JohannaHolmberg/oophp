@@ -69,9 +69,8 @@ namespace Anax\View;
             <div class="main-left-bottom-div-histogram">
                 <div class="main-left-bottom-div-player">
                     <?php if ($rolledDice) : ?> <!-- When player plays -->
-                        <p> <?= $playerAllRollHistogramArray ?> </p>
                         <?php foreach ($playerAllRollHistogramArray as $hand) : ?>
-                            <p> <?= $hand ?> </p>
+                                <p> <?= $hand ?> </p>
 
                         <?php endforeach; ?>
 
@@ -80,14 +79,11 @@ namespace Anax\View;
 
                 <div class="main-left-bottom-div-computer">
                     <?php if ($computerHasPlayed) : ?> <!-- When computer plays -->
-                        <?php if (is_array($printComputerHistogramValue)) : ?> <!-- When computer plays -->
 
                             <?php foreach ($printComputerHistogramValue as $hand) : ?>
                                 <p> <?= $hand ?> </p>
 
                             <?php endforeach; ?>
-
-                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
 

@@ -70,6 +70,11 @@ h3 {
 
 
 
+/* Movie database  */
+.thumb {
+    max-width: 100px;
+    max-height: 100px;
+}
 
 
 

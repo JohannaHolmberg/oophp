@@ -12,9 +12,9 @@ class HistogramTest extends TestCase
     // return type is correct = array
     public function testReturnTypegetHistogramSerie()
     {
-        $Dh = new DiceHistogram();
+        $dhm = new DiceHistogram();
 
-        $histogramArray = $Dh->getHistogramSerie();
+        $histogramArray = $dhm->getHistogramSerie();
         $this->assertTrue(is_array($histogramArray));
     }
 
@@ -22,9 +22,9 @@ class HistogramTest extends TestCase
     // return type is correct = string
     public function testReturnTypeprintHistogram()
     {
-        $Dh = new DiceHistogram();
+        $dhm = new DiceHistogram();
 
-        $histogramArray = $Dh->printHistogram();
+        $histogramArray = $dhm->printHistogram();
         $this->assertTrue(is_string($histogramArray));
     }
 }

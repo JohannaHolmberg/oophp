@@ -80,8 +80,13 @@ return [
         ],
         [
             "text" => "Dice game 1",
-            "url" => "dice1",
+            "url" => "dice1-game",
             "title" => "1 Spela 100 spelet",
+        ],
+        [
+            "text" => "Movie Database",
+            "url" => "movie",
+            "title" => "Movie Database",
         ],
     ],
 ];
