@@ -18,7 +18,7 @@
 <!--    <a href="?route=movie-edit">Edit</a> | -->
     <a href="?route=show-all-sort">Show all sortable</a> |
     <a href="?route=show-all-paginate">Show all paginate</a> |
-</navbar> 
+</navbar>
 
 <h1>My Movie Database</h1>
 

@@ -1,6 +1,7 @@
 <?php
 
-namespace Jo\Movie;
+// namespace Jo\Movie;
+
 /**
  * Get value from GET variable or return default value.
  *

@@ -1,5 +1,9 @@
 <?php
 // Restore the database to its original settings
+
+require "header.php";
+require "../../src/Movie/config.php";
+
 $file   = "sql/setup.sql";
 $mysql  = "/usr/bin/mysql";
 $output = null;

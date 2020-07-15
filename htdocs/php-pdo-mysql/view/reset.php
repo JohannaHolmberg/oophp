@@ -1,6 +1,7 @@
 <?php
 // Restore the database to its original settings
 $file   = "sql/setup.sql";
+var_dump($file);
 $mysql  = "/usr/bin/mysql";
 $output = null;
 

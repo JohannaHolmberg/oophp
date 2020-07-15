@@ -1,4 +1,7 @@
 <?php
+
+namespace Jo\Movie;
+
 /**
  * Set the error reporting.
  */

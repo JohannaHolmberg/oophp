@@ -1,16 +1,18 @@
+<?php require "header.php"; ?>
+
 <form method="post">
     <fieldset>
     <legend>Select Movie</legend>
 
     <p>
         <label>Movie:<br>
-        <select name="movieId">
-            <option value="">Select movie...</option>
-            <?php foreach ($movies as $movie) : ?>
-            <option value="<?= $movie->id ?>"><?= $movie->title ?></option>
-            <?php endforeach; ?>
-        </select>
-    </label>
+            <select name="movieId">
+                <option value="">Select movie...</option>
+                <?php foreach ($movies as $movie) : ?>
+                <option value="<?= $movie->id ?>"><?= $movie->title ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
     </p>
 
     <p>

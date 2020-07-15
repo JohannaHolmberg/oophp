@@ -1,4 +1,7 @@
 <?php
+
+namespace Jo\Movie;
+
 /**
  * Class to collect all database activities.
  */
