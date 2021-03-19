@@ -74,7 +74,7 @@ function esc($value)
  * Create a slug of a string, to be used as url.
  *
  * @param string $str the string to format as slug.
- *
+ * 
  * @return str the formatted slug.
  */
 function slugify($str)

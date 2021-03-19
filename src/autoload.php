@@ -1,7 +1,4 @@
 <?php
-
-namespace Jo\Movie;
-
 /**
  * Autoloader for classes.
  *

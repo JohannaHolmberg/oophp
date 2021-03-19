@@ -5,9 +5,8 @@ namespace Jo\Movie;
 use Anax\Commons\AppInjectableInterface;
 use Anax\Commons\AppInjectableTrait;
 
-require "autoload.php";
-// require "config.php";
-require "function.php";
+// require __DIR__ . "/function.php";
+require_once __DIR__ . "/function.php";
 
 class MovieController extends Database implements AppInjectableInterface
 {
@@ -20,7 +19,6 @@ class MovieController extends Database implements AppInjectableInterface
      */
     public function indexAction() : object
     {
-        //$title = "Movie database | oophp";
 
         // Connect to database
         $this->app->db->connect(); // method from Database class!
@@ -117,7 +115,8 @@ class MovieController extends Database implements AppInjectableInterface
                     $movieId = $this->app->db->lastInsertId();
                     header("Location: ?route=movie-edit&movieId=$movieId");
                 } elseif (getPost("doEdit") && is_numeric($movieId)) {
-                    header("Location: ?route=movie-edit&movieId=$movieId");
+                    //header("Location: ?route=movie-edit&movieId=$movieId");
+                    $this->app->response->redirect("?route=movie-edit&movieId=$movieId");
                 }
                 $title = "Select a movie";
                 $view[] = "view/movie-select.php";
@@ -140,7 +139,8 @@ class MovieController extends Database implements AppInjectableInterface
                 if (getPost("doSave")) {
                     $sql = "UPDATE movie SET title = ?, year = ?, image = ? WHERE id = ?;";
                     $this->app->db->execute($sql, [$movieTitle, $movieYear, $movieImage, $movieId]);
-                    header("Location: ?route=movie-edit&movieId=$movieId");
+                    // header("Location: ?route=movie-edit&movieId=$movieId");
+                    $this->app->response->redirect("?route=");
                 }
                 $sql = "SELECT * FROM movie WHERE id = ?;";
                 $movie = $this->app->db->executeFetchAll($sql, [$movieId]);

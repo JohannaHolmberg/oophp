@@ -10,7 +10,6 @@ class DiceController implements AppInjectableInterface
     use AppInjectableTrait;
 
 
-
     /**
      * @var string $db a sample member variable that gets initialised
      */
@@ -106,9 +105,11 @@ class DiceController implements AppInjectableInterface
         $session = $this->app->session;
         $title = "1 Dice 100 game";
 
-        $game = $session->get("game"); // put gavecontroller in a variable
+        $game = $session->get("game"); // put game controller in a variable
         $pHand = $session->get("playerHand"); // get value of each rolled hand
         $hVm = $session->get("hV"); // get the histogram class object
+
+
 
         // when changed to true, it will mean that the save button has been clicked
         //$savedRound = false;
@@ -139,6 +140,11 @@ class DiceController implements AppInjectableInterface
              $hVm->setplayerHistogramString($returnPrintHistogram); //$playerOld . $returnPrintHistogram;
             // ---- END player histogram -----------------------------------------
 
+
+
+
+
+
             $computerRoll1Value = false; // remove computer roll text
             $session->set("computerRollHasA1Value", $computerRoll1Value);
 
@@ -155,6 +161,83 @@ class DiceController implements AppInjectableInterface
             if ($playerRollHasA1Value) { // if true -> there is a 1 in the hand of dices
                 // remove all points from player, set round player score to 0
                 $game->setPlayerScoreToZero();
+
+
+                /**
+                *
+                * Play for computer
+                *
+                */
+                $cHistogram = $session->get("cH"); // get the histogram class object for computer
+                $computerHasPlayed = true;// SIMULATE COMPUTER BUTTON has been clicked:
+
+                $session->set("computerHasPlayed", $computerHasPlayed);
+                // $session->set("simulateComputer", $simulateComputer);
+                //$session->set("simulateComputer", null);
+
+                $playerRollHasA1Value = false; // default value, turn to true when a roll has a value 1
+                $session->set("playerRollHasA1Value", $playerRollHasA1Value); // remove player text
+
+                $round = new GameRound(); // start a new round with the GameRound
+                $game = $_SESSION["game"]; // save game object in variable to use later
+                $cHistogramand = $round->getComputerHand(); // save computer hand rolled
+                $session->set("cHand", $cHistogramand); // set the value of current roll to a session
+
+
+
+                // ---- START COMPUTER histogram -----------------------------------------
+                $histogramValues = $cHistogram->roll($cHistogramand->getDiceValue()); // get current roll
+                $returnPrintHistogram = $cHistogram->printHistogram(1, 6); // return string with roll ****
+                $cHistogram->setcomputerHistogramString($returnPrintHistogram);
+
+                /** IF STATMENT for COMPUTER ROLL, to see if there has been rolled a 1! */
+                if ($game->rollComputerHasAValueOne($cHistogramand->getDiceValue())) {  // if true -> there is a 1 in the hand of dices
+                    // remove all points from player, set round player score to 0
+                    $game->setComputerScoreToZero();
+                    $computerRoll1Value = $game->rollComputerHasAValueOne($cHistogramand->getDiceValue());
+                    $session->set("computerRollHasA1Value", $computerRoll1Value);
+                } else {  // No 1 in hand of dice,
+                    // get the new round hand value sum score
+                    $prs = $game->sumHandValueForOneRound($cHistogramand->getDiceValue());
+                    $computerRoundScore = $game->updateRoundComputerScore($prs); // update new with old score
+                    $totCScore = $game->getTotComputerScore();
+                    $ran;
+                    if ($totCScore >= 0) {
+                        $ran = rand(1, 3); // 33% chance computer rolls again
+                    } elseif ($totCScore > 50) {
+                        $ran = rand(1, 2); // 50% chance computer rolls again
+                    }
+
+                    if ($ran === 1) { // computer wants to roll again
+                        $round = new GameRound();
+                        // 2nd roll, even if a one is here, it should show histogram
+                        $histogramValues = $cHistogram->roll($cHistogramand->getDiceValue()); // get current roll
+                        $returnPrintHistogram = $cHistogram->printHistogram(1, 6); // return string with roll ****
+                        $cHistogram->setcomputerHistogramString($returnPrintHistogram);
+
+                        if ($game->rollComputerHasAValueOne($cHistogramand->getDiceValue())) {  // if true -> there is a 1 in the hand of dices
+                            $game->setComputerScoreToZero();// remove all points from player, set round player score to 0
+                            $computerRoll1Value = $game->rollComputerHasAValueOne($cHistogramand->getDiceValue());
+                            $session->set("computerRollHasA1Value", $computerRoll1Value);
+                        } else {
+                            $prs = $game->sumHandValueForOneRound($cHistogramand->getDiceValue()); // get the new round hand value sum score
+                            $computerRoundScore = $game->updateRoundComputerScore($prs); // update new with old score
+                            $totComputerScore = $game->updateTotComputerScore($computerRoundScore); // update totComputerScore
+                            $computerRoundScore = $game->setComputerScoreToZero(); //set round score to 0
+                        }
+                    } elseif ($ran === 2) {  // computer wants to save the first roll
+                        $totComputerScore = $game->updateTotComputerScore($computerRoundScore); // update totComputerScore
+                        $computerRoundScore = $game->setComputerScoreToZero(); //set round score to 0
+                    }
+                }
+
+
+
+                /**
+                *
+                * END Play for computer
+                *
+                */
             } else { // No 1 in hand of dice, player won one round
                 $prs = $game->sumHandValueForOneRound($pHand->getDiceValue()); // get the new round hand value sum score
                 $game->updateRoundPlayerScore($prs);// update new with old score
@@ -164,21 +247,40 @@ class DiceController implements AppInjectableInterface
             $roundScore = $game->getRoundPlayerScore();
             $totScore = $game->getTotPlayerScore();
 
+
             if ($game->isBigger100($roundScore + $totScore)) { // create variables here to send to play.php
                 $playerWon = true;
                 $session->set("playerWon", $playerWon);
             }
+
+            $totComputerScore = $game->getTotComputerScore();     // zero out computer rolls values
+
+            if ($game->isBigger100($totComputerScore)) { // check here if tot points is more than 100
+                $session->set("computerWon", true);
+                $computerWon = $session->get("computerWon");
+
+                // STOP game if this happens!
+            }
         } // end PLAYER "roll"
 
-        $totComputerScore = $game->getTotComputerScore();     // zero out computer rolls values
-
+        $totComputerScore = $game->getTotComputerScore();
         if ($game->isBigger100($totComputerScore)) { // check here if tot points is more than 100
             $session->set("computerWon", true);
             $computerWon = $session->get("computerWon");
+
+            // STOP game if this happens!
         }
+
+        $roundScore = $game->getRoundPlayerScore();
+        $totScore = $game->getTotPlayerScore();
+
+        $playerRoundAndTot = $roundScore + $totScore;
 
         $cHistogram = $session->get("cH");
         $computerHasPlayed = $session->get("computerHasPlayed");
+
+        //$session->set("totPlayerScore", $totPlayerScore);
+        $session->set("totComputerScore", $totComputerScore);
 
         $data = [
             "playerHand" => $pHand->getDiceValue() ?? "",
@@ -186,6 +288,7 @@ class DiceController implements AppInjectableInterface
             "savedRound" => $session->get("savedRound"),
             "playerRoundScore" => $game->getRoundPlayerScore(),
             "totPlayerScore" => $game->getTotPlayerScore(),
+            "totPlayerScoreWin" => $playerRoundAndTot,
             "totComputerScore" => $game->getTotComputerScore(),
             "playerRollHasA1Value" => $playerRollHasA1Value,
             "computerRolledOne" => $computerRoll1Value,
@@ -218,19 +321,133 @@ class DiceController implements AppInjectableInterface
 
         $roll = $request->getPost("roll");
         $simulateComputer = $request->getPost("simulateComputer");
+
         /***  When COMPUTER simulation is clicked  **/
-        if ($request->getPost("simulateComputer")) {
+
+        // if ($request->getPost("simulateComputer")) {
+        //     $cHistogram = $session->get("cH"); // get the histogram class object for computer
+        //     $computerHasPlayed = true;// SIMULATE COMPUTER BUTTON has been clicked:
+        //
+        //     $session->set("computerHasPlayed", $computerHasPlayed);
+        //     $session->set("simulateComputer", $simulateComputer);
+        //     $session->set("simulateComputer", null);
+        //
+        //     $playerRollHasA1Value = false; // default value, turn to true when a roll has a value 1
+        //     $session->set("playerRollHasA1Value", $playerRollHasA1Value); // remove player text
+        //
+        //     $round = new GameRound(); // start a new round with the GameRound
+        //     $game = $_SESSION["game"]; // save game object in variable to use later
+        //     $cHistogramand = $round->getComputerHand(); // save computer hand rolled
+        //     $session->set("cHand", $cHistogramand); // set the value of current roll to a session
+        //
+        //
+        //
+        //     // ---- START COMPUTER histogram -----------------------------------------
+        //     $histogramValues = $cHistogram->roll($cHistogramand->getDiceValue()); // get current roll
+        //     $returnPrintHistogram = $cHistogram->printHistogram(1, 6); // return string with roll ****
+        //     $cHistogram->setcomputerHistogramString($returnPrintHistogram);
+        //
+        //     /** IF STATMENT for COMPUTER ROLL, to see if there has been rolled a 1! */
+        //     if ($game->rollComputerHasAValueOne($cHistogramand->getDiceValue())) {  // if true -> there is a 1 in the hand of dices
+        //         // remove all points from player, set round player score to 0
+        //         $game->setComputerScoreToZero();
+        //         $computerRoll1Value = $game->rollComputerHasAValueOne($cHistogramand->getDiceValue());
+        //         $session->set("computerRollHasA1Value", $computerRoll1Value);
+        //     } else {  // No 1 in hand of dice,
+        //         // get the new round hand value sum score
+        //         $prs = $game->sumHandValueForOneRound($cHistogramand->getDiceValue());
+        //         $computerRoundScore = $game->updateRoundComputerScore($prs); // update new with old score
+        //         $totCScore = $game->getTotComputerScore();
+        //         $ran;
+        //         if ($totCScore >= 0) {
+        //             $ran = rand(1, 3); // 33% chance computer rolls again
+        //         } elseif ($totCScore > 50) {
+        //             $ran = rand(1, 2); // 50% chance computer rolls again
+        //         }
+        //
+        //         if ($ran === 1) { // computer wants to roll again
+        //             $round = new GameRound();
+        //             // 2nd roll, even if a one is here, it should show histogram
+        //             $histogramValues = $cHistogram->roll($cHistogramand->getDiceValue()); // get current roll
+        //             $returnPrintHistogram = $cHistogram->printHistogram(1, 6); // return string with roll ****
+        //             $cHistogram->setcomputerHistogramString($returnPrintHistogram);
+        //
+        //             if ($game->rollComputerHasAValueOne($cHistogramand->getDiceValue())) {  // if true -> there is a 1 in the hand of dices
+        //                 $game->setComputerScoreToZero();// remove all points from player, set round player score to 0
+        //                 $computerRoll1Value = $game->rollComputerHasAValueOne($cHistogramand->getDiceValue());
+        //                 $session->set("computerRollHasA1Value", $computerRoll1Value);
+        //             } else {
+        //                 $prs = $game->sumHandValueForOneRound($cHistogramand->getDiceValue()); // get the new round hand value sum score
+        //                 $computerRoundScore = $game->updateRoundComputerScore($prs); // update new with old score
+        //                 $totComputerScore = $game->updateTotComputerScore($computerRoundScore); // update totComputerScore
+        //                 $computerRoundScore = $game->setComputerScoreToZero(); //set round score to 0
+        //             }
+        //         } elseif ($ran === 2) {  // computer wants to save the first roll
+        //             $totComputerScore = $game->updateTotComputerScore($computerRoundScore); // update totComputerScore
+        //             $computerRoundScore = $game->setComputerScoreToZero(); //set round score to 0
+        //         }
+        //     }
+        // } // end "computer roll"
+
+        /**
+        *  When PLAYER ROLL button is clicked
+        */
+        if ($request->getPost("roll")) {
+            $session->set("computerAllRollHistogramArray", "");
+            // start a new round with the GameRound
+            $round = new GameRound();
+            $game = $session->get("game");
+
+            $session->set("playerRoundScore", $game->getRoundPlayerScore());
+            $session->set("playerHand", $round->getPlayerHand());
+
+            $session->set("round", $round); // save round in session
+            $session->set("roll", $roll);
+        }
+
+        /**
+        *  When SAVE button is clicked
+        */
+        if ($request->getPost("save")) {
+            $game = $session->get("game"); // get game object from session
+            $session->set("savedRound", true);//save in session, to send to play.php;
+
+            // get RoundScore for both players, to update to tot score
+            $playerRoundScore = $game->getRoundPlayerScore();
+
+            // $game->updateTotPlayerScore($playerRoundScore); // update totPlayerScore
+
+
+            $totPlayerScore = $game->updateTotPlayerScore($playerRoundScore); // update totPlayerScore
+
+            $session->set("totPlayerScore", $totPlayerScore);
+
+            $playerRoundScore = $game->setPlayerScoreToZero(); //set round score to 0
+
+
+            /**
+            *
+            *  Play for computer
+            *
+            */
+
             $cHistogram = $session->get("cH"); // get the histogram class object for computer
             $computerHasPlayed = true;// SIMULATE COMPUTER BUTTON has been clicked:
+
             $session->set("computerHasPlayed", $computerHasPlayed);
             $session->set("simulateComputer", $simulateComputer);
             $session->set("simulateComputer", null);
+
             $playerRollHasA1Value = false; // default value, turn to true when a roll has a value 1
             $session->set("playerRollHasA1Value", $playerRollHasA1Value); // remove player text
+
             $round = new GameRound(); // start a new round with the GameRound
             $game = $_SESSION["game"]; // save game object in variable to use later
             $cHistogramand = $round->getComputerHand(); // save computer hand rolled
             $session->set("cHand", $cHistogramand); // set the value of current roll to a session
+
+
+
             // ---- START COMPUTER histogram -----------------------------------------
             $histogramValues = $cHistogram->roll($cHistogramand->getDiceValue()); // get current roll
             $returnPrintHistogram = $cHistogram->printHistogram(1, 6); // return string with roll ****
@@ -276,35 +493,12 @@ class DiceController implements AppInjectableInterface
                     $computerRoundScore = $game->setComputerScoreToZero(); //set round score to 0
                 }
             }
-        } // end "computer roll"
 
-        /**
-        *  When PLAYER ROLL button is clicked
-        */
-        if ($request->getPost("roll")) {
-            $session->set("computerAllRollHistogramArray", "");
-            // start a new round with the GameRound
-            $round = new GameRound();
-            $game = $session->get("game");
-
-            $session->set("playerRoundScore", $game->getRoundPlayerScore());
-            $session->set("playerHand", $round->getPlayerHand());
-
-            $session->set("round", $round); // save round in session
-            $session->set("roll", $roll);
-        }
-
-        /**
-        *  When SAVE button is clicked
-        */
-        if ($request->getPost("save")) {
-            $game = $session->get("game"); // get game object from session
-            $session->set("savedRound", true);//save in session, to send to play.php;
-
-            // get RoundScore for both players, to update to tot score
-            $playerRoundScore = $game->getRoundPlayerScore();
-            $game->updateTotPlayerScore($playerRoundScore); // update totPlayerScore
-            $playerRoundScore = $game->setPlayerScoreToZero(); //set round score to 0
+            /**
+            *
+            * END Play for computer
+            *
+            */
         }
         return $this->app->response->redirect("dice1/play");
     }

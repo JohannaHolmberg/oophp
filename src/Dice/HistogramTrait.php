@@ -38,7 +38,7 @@ trait HistogramTrait
     {
         array_push($this->computerHistogramString, $currentRollString);
 
-        var_dump($this->computerHistogramString);
+        // var_dump($this->computerHistogramString);
 
         return $this->computerHistogramString;
     }

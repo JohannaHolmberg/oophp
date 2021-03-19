@@ -7,7 +7,7 @@
  *
  * @return mixed value from GET or the default value
  */
-function getGet($key, $default = null)
+function getGetBlog($key, $default = null)
 {
     return isset($_GET[$key])
         ? $_GET[$key]
@@ -24,13 +24,13 @@ function getGet($key, $default = null)
  *
  * @return mixed value from POST or the default value
  */
-function getPost($key, $default = null)
+function getPostBlog($key, $default = null)
 {
     if (is_array($key)) {
         // $key = array_flip($key);
         // return array_replace($key, array_intersect_key($_POST, $key));
         foreach ($key as $val) {
-            $post[$val] = getPost($val);
+            $post[$val] = getPostBlog($val);
         }
         return $post;
     }
@@ -49,7 +49,7 @@ function getPost($key, $default = null)
  *
  * @return boolean true if key is set, otherwise false
  */
-function hasKeyPost($key)
+function hasKeyPostBlog($key)
 {
     return array_key_exists($key, $_POST);
 }
@@ -63,7 +63,7 @@ function hasKeyPost($key)
  *
  * @return string beeing sanitized
  */
-function esc($value)
+function escBlog($value)
 {
     return htmlentities($value);
 }
@@ -77,7 +77,7 @@ function esc($value)
  *
  * @return str the formatted slug.
  */
-function slugify($str)
+function slugifyBlog($str)
 {
     $str = mb_strtolower(trim($str));
     $str = str_replace(['å','ä'], 'a', $str);
